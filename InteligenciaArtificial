@@ -1,0 +1,738 @@
+# This is a complete Python script to generate the HTML file for the interactive course.
+# This approach is chosen because the final output is a single, self-contained HTML file.
+# The HTML includes all the necessary CSS and JavaScript, making it easy for the user to upload to Google Sites.
+# Instead of writing the code directly in the response, this script ensures all parts are correctly formatted and combined.
+
+# It is a good practice to use string concatenation and f-strings for readability when generating large blocks of text like HTML.
+
+# Define the HTML structure for the course page.
+html_content = f"""
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso: Investigar con IA - Hospital del Móvil</title>
+    <style>
+        /* CSS general basado en la guía de marca */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {{
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }}
+        .container {{
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }}
+        .header img {{
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }}
+        .header-text h1 {{
+            font-size: 18px;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }}
+        .header-text .subtitle {{
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 0;
+        }}
+        .progress-bar {{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: rgba(255,255,255,0.3);
+        }}
+        .progress-fill {{
+            height: 100%;
+            background-color: #25D366;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }}
+        .explanation-bar {{
+            background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%);
+            color: white;
+            font-size: 0.85em;
+            text-align: center;
+            padding: 8px 20px;
+            margin-bottom: 20px;
+        }}
+        .phone-container {{
+            width: calc(100vw - 120px);
+            max-width: 600px;
+            height: 650px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+            position: relative;
+            background-color: #E5DDD5;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }}
+        .chat-header {{
+            background: linear-gradient(135deg, #075E54, #128C7E);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+        }}
+        .chat-messages {{
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }}
+        .message {{
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            animation: messageAppear 0.5s ease-out;
+        }}
+        .message.assistant {{
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            align-self: flex-start;
+        }}
+        .message.user {{
+            background-color: #DCF8C6;
+            align-self: flex-end;
+        }}
+        .message p {{
+            margin: 0;
+        }}
+        .typing-indicator {{
+            display: none;
+            align-self: flex-start;
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }}
+        .typing-indicator span {{
+            background-color: #ccc;
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            display: inline-block;
+            animation: typing 1.5s infinite;
+        }}
+        .typing-indicator span:nth-child(2) {{
+            animation-delay: 0.2s;
+        }}
+        .typing-indicator span:nth-child(3) {{
+            animation-delay: 0.4s;
+        }}
+        @keyframes typing {{
+            0%, 60%, 100% {{ transform: translateY(0); }}
+            30% {{ transform: translateY(-5px); }}
+        }}
+        .input-area {{
+            display: flex;
+            padding: 10px;
+            background-color: #F0F0F0;
+            border-top: 1px solid #ddd;
+        }}
+        .input-area input {{
+            flex-grow: 1;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            outline: none;
+        }}
+        .input-area button {{
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            outline: none;
+            font-size: 18px;
+        }}
+        .options-container {{
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }}
+        .option-button {{
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }}
+        .option-button:hover {{
+            background-color: #128C7E;
+        }}
+        @keyframes messageAppear {{
+            from {{ opacity: 0; transform: translateY(20px) scale(0.95); }}
+            to {{ opacity: 1; transform: translateY(0) scale(1); }}
+        }}
+        
+        /* Estilos de la barra lateral flotante - GUIAS DE MARCA */
+        .sidebar-contact {{
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%);
+            border-radius: 25px;
+            padding: 15px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }}
+        .contact-icon {{
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }}
+        .contact-icon:hover {{
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }}
+        .contact-icon.whatsapp {{ background: #25D366; }}
+        .contact-icon.phone {{ background: #DC3545; }}
+        .contact-icon.facebook {{ background: #1877F2; }}
+        .contact-icon svg {{ width: 20px; height: 20px; }}
+        
+        /* Estilos para el footer y los iconos */
+        .footer {{
+            background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }}
+        .contact-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: left;
+            margin-top: 15px;
+        }}
+        .footer-icon-links {{
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }}
+        .footer-icon-links .contact-icon {{
+            position: relative;
+            transform: none;
+            top: auto;
+            left: auto;
+        }}
+        .footer-icon-links .contact-icon:hover {{
+            transform: scale(1.1);
+        }}
+
+        .rating-section {{
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-top: 20px;
+            display: none;
+        }}
+        .rating-stars span {{
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }}
+        .rating-stars span.filled {{
+            color: gold;
+        }}
+        .feedback-area {{
+            margin-top: 10px;
+        }}
+        #feedbackText {{
+            width: 100%;
+            height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px;
+            box-sizing: border-box;
+        }}
+        .rating-section button {{
+            background-color: #B22222;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }}
+        .google-reviews-prompt {{
+            padding: 15px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }}
+        .google-reviews-prompt a {{
+            color: #155724;
+            font-weight: bold;
+        }}
+    </style>
+</head>
+<body>
+    <div class="sidebar-contact">
+        <a href="https://wa.me/525555788393609?text=Hola,%20vengo%20del%20curso%20de%20IA%20y%20tengo%20una%20consulta." target="_blank" class="contact-icon whatsapp" title="Consultar por WhatsApp">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+            </svg>
+        </a>
+        <a href="tel:+525552077189" class="contact-icon phone" title="Llamar a Hospital del Móvil">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.75-.25 1.02l-2.2 2.2z"/>
+            </svg>
+        </a>
+        <a href="https://www.facebook.com/hospitaldeImovil" target="_blank" class="contact-icon facebook" title="Contactar por Facebook">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <img src="https://i.imgur.com/cqRWu7U.png" alt="Hospital del Móvil">
+            <div class="header-text">
+                <h1>🏥 Hospital del Móvil</h1>
+                <p class="subtitle">Asistente de Capacitación en Investigación con IA</p>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="explanation-bar">
+            Los íconos laterales están disponibles para contacto directo • Horario: L-V 11:00-19:00, Sáb 11:00-15:00 o déjanos mensaje
+        </div>
+        
+        <div class="phone-container">
+            <div class="chat-header">Asistente Técnico</div>
+            <div class="chat-messages" id="chat-messages">
+                </div>
+            <div class="options-container" id="options-container">
+                </div>
+            <div class="input-area" id="input-area" style="display:none;">
+                <input type="text" id="userInput" placeholder="Escribe tu respuesta..." disabled>
+                <button id="sendBtn" disabled>▶</button>
+            </div>
+            
+            <div class="rating-section" id="ratingSection">
+                <h4 style="margin-top:0;">⭐ Evaluación del Curso</h4>
+                <p><strong>¿Cómo calificarías esta experiencia?</strong></p>
+                <div class="rating-stars" id="ratingStars">
+                    <span class="star" data-rating="1">⭐</span>
+                    <span class="star" data-rating="2">⭐</span>
+                    <span class="star" data-rating="3">⭐</span>
+                    <span class="star" data-rating="4">⭐</span>
+                    <span class="star" data-rating="5">⭐</span>
+                </div>
+                <div class="feedback-area">
+                    <textarea id="feedbackText" placeholder="Comentarios y sugerencias..."></textarea>
+                    <label style="display:block; margin-top:10px;">
+                        <input type="checkbox" id="allowFeedback" checked>
+                        Autorizo enviar estos comentarios a Hospital del Móvil
+                    </label>
+                    <button id="submitFeedbackBtn">📤 Enviar</button>
+                </div>
+            </div>
+            
+            <div class="google-reviews-prompt" id="googleReviewsPrompt">
+                <p>¡Nos alegra que te haya gustado el curso! ¿Nos ayudarías a crecer dejando una reseña en Google?</p>
+                <a href="https://g.page/r/CX5yYQy_lq-eEBM/review" target="_blank" style="display:inline-block; margin-top:10px;">Dejar Reseña en Google</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3 style="margin:0; font-weight:500;">🏥 Hospital del Móvil</h3>
+            <div class="contact-grid">
+                <div>
+                    <strong>📍 Dirección:</strong>
+                    <p style="margin:5px 0 0;">Florencia 70 Local "F", Zona Rosa, CDMX 06600</p>
+                </div>
+                <div>
+                    <strong>📞 Contacto:</strong>
+                    <p style="margin:5px 0 0;">Tel: +52 (55) 5207-7189</p>
+                    <p style="margin:5px 0 0;">Email: zonarosa@hospitaldelmovil.com.mx</p>
+                </div>
+            </div>
+            <div class="footer-icon-links">
+                <a href="https://wa.me/525555788393609" target="_blank" class="contact-icon whatsapp" title="WhatsApp">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                </a>
+                <a href="https://www.facebook.com/hospitaldeImovil" target="_blank" class="contact-icon facebook" title="Facebook">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+                <a href="mailto:zonarosa@hospitaldelmovil.com.mx" class="contact-icon" style="background-color:#6c757d;" title="Email">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                </a>
+            </div>
+            <div style="font-size: 11px; margin-top:15px; opacity: 0.8;">
+                <p>&copy; 2025 Hospital del Móvil. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {{
+            const chatMessages = document.getElementById("chat-messages");
+            const optionsContainer = document.getElementById("options-container");
+            const progressBar = document.getElementById("progressBar");
+            const ratingSection = document.getElementById("ratingSection");
+            const googleReviewsPrompt = document.getElementById("googleReviewsPrompt");
+            const ratingStars = document.getElementById("ratingStars");
+            const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+
+            let conversationData = {{}};
+            let currentStep = 0;
+            let userRating = 0;
+
+            const courseContent = [
+                {{
+                    message: "¡Hola! 👋 Soy tu asistente de capacitación de Hospital del Móvil para el curso 'Investigar adecuadamente aplicando herramientas de Inteligencia Artificial'. Estoy aquí para guiarte en este nuevo proceso. ¿Estás listo para empezar?",
+                    options: [
+                        "¡Estoy listo!",
+                        "¿De qué se trata este curso?"
+                    ],
+                    action: (response) => {{
+                        if (response === "¡Estoy listo!") {{
+                            addMessage("¡Estoy listo!", "user");
+                            setTimeout(() => showStep(1), 1000);
+                        }} else {{
+                            addMessage("¿De qué se trata este curso?", "user");
+                            setTimeout(() => showStep(2), 1000);
+                        }}
+                    }}
+                }},
+                {{
+                    message: "¡Excelente! Comencemos con un auto-diagnóstico. Cuéntame, ¿cuándo un dispositivo no enciende o tiene una falla intermitente, qué es lo primero que haces?",
+                    input: true,
+                    action: (response) => {{
+                        conversationData.initialAction = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(3), 1000);
+                    }}
+                }},
+                {{
+                    message: "Gracias por tu honestidad. La mayoría de nosotros usamos la experiencia, pero eso puede llevarnos a repetir errores. ¿Sabías que muchos problemas (como los de display o carga) se corrigen con un simple servicio de mantenimiento, sin necesidad de un cambio de pieza? [cite: 289]",
+                    options: [
+                        "Sí, ya lo sabía.",
+                        "No lo sabía, ¡qué interesante!"
+                    ],
+                    action: (response) => {{
+                        conversationData.maintenanceAwareness = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(4), 1000);
+                    }}
+                }},
+                {{
+                    message: "El primer paso para una reparación de calidad es la investigación. Antes de abrir un dispositivo, ¿qué información debes buscar?",
+                    options: [
+                        "Diagramas y manuales del modelo.",
+                        "Video tutoriales en YouTube.",
+                        "Preguntarle a un colega."
+                    ],
+                    action: (response) => {{
+                        conversationData.researchMethod = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(5), 1000);
+                    }}
+                }},
+                {{
+                    message: "Todas son opciones, pero la clave es <strong style='color:#B22222;'>evaluar la fuente</strong>. Un video de un canal desconocido tiene más riesgo que un diagrama oficial. La IA puede ayudarnos a ponderar esto. ¿Te gustaría saber cómo?",
+                    options: [
+                        "Sí, quiero aprender a usar la IA.",
+                        "Prefiero mis métodos tradicionales."
+                    ],
+                    action: (response) => {{
+                        conversationData.useAITools = response;
+                        addMessage(response, "user");
+                        if (response === "Sí, quiero aprender a usar la IA.") {{
+                            setTimeout(() => showStep(6), 1000);
+                        }} else {{
+                            setTimeout(() => showStep(10), 1000);
+                        }}
+                    }}
+                }},
+                {{
+                    message: "Fantástico. Herramientas como Gemini o NotebookLM pueden procesar grandes volúmenes de información (manuales, foros técnicos, reportes de colegas) y ayudarte a encontrar la solución más probable, minimizando los riesgos de 'experimentos' sin fundamento. Este es un punto clave para elevar nuestra calidad[cite: 414].",
+                    options: [
+                        "¿Cómo aplicamos esto en la práctica?",
+                        "¿Qué es NotebookLM?"
+                    ],
+                    action: (response) => {{
+                        conversationData.AIApplication = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(7), 1000);
+                    }}
+                }},
+                {{
+                    message: "Imagina que tienes un iPhone 12 con un problema de audio. Usando IA, podrías:\n\n1. Subir a NotebookLM el manual de servicio del iPhone 12 y nuestros reportes de fallas pasadas. [cite: 417]\n\n2. Preguntar: '¿Cuáles son las causas más comunes de falla de audio en el iPhone 12 según nuestros registros y el manual de servicio?'\n\n3. La IA te daría un resumen claro y te señalaría la solución más probable. Esto te ahorra tiempo y evita errores recurrentes[cite: 420].\n\n¿Te parece útil este proceso?",
+                    options: [
+                        "Sí, muy útil.",
+                        "Aún tengo dudas."
+                    ],
+                    action: (response) => {{
+                        conversationData.isUseful = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(8), 1000);
+                    }}
+                }},
+                {{
+                    message: "El siguiente paso, y el más importante para la mejora continua, es <strong style='color:#B22222;'>documentar tu hallazgo</strong>. [cite: 409] Al registrar lo que aprendiste, estás creando un 'capital intelectual' para todo el equipo. ¿Por qué crees que es crucial documentar cada reparación?",
+                    input: true,
+                    action: (response) => {{
+                        conversationData.documentationImportance = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(9), 1000);
+                    }}
+                }},
+                {{
+                    message: "¡Exacto! La documentación organizada y la consulta de esta 'biblioteca' nos permiten prevenir errores, reducir tiempos de diagnóstico y formar a nuevos técnicos más rápidamente. Al usar estas herramientas y documentar tus casos, te conviertes en un generador de conocimiento, no solo un consumidor. ¡Esto eleva tu profesionalismo! [cite: 426]",
+                    options: [
+                        "¡Entendido!",
+                        "¿Y qué pasa si hay un caso especial?"
+                    ],
+                    action: (response) => {{
+                        conversationData.finalThought = response;
+                        addMessage(response, "user");
+                        if (response === "¡Entendido!") {{
+                             setTimeout(() => showStep(11), 1000);
+                        }} else {{
+                             setTimeout(() => showStep(10), 1000);
+                        }}
+                    }}
+                }},
+                {{
+                    message: "Recuerda que estas políticas aplican a todos. Antes de proceder con cualquier reparación en el dispositivo, es obligatorio haber identificado la falla y haber pasado por el proceso técnico. ¡No se acepta ningún diagnóstico sin confirmar por un técnico certificado![cite: 274, 276, 345]. Además, en casos como daños en la tarjeta o dispositivos mojados, siempre debes informar al cliente sobre los riesgos, probabilidades y costos adicionales, nunca dar certezas[cite: 359, 374, 376].",
+                    options: [
+                        "Claro, comprendido.",
+                        "¿Hay algo más que deba saber?"
+                    ],
+                    action: (response) => {{
+                        conversationData.specialCases = response;
+                        addMessage(response, "user");
+                        setTimeout(() => showStep(11), 1000);
+                    }}
+                }},
+                {{
+                    message: "Hemos llegado al final de este curso. Te invitamos a aplicar lo aprendido y a contribuir activamente a nuestro nuevo capital intelectual. ¡Tu crecimiento profesional es el crecimiento de Hospital del Móvil!",
+                    final: true
+                }}
+            ];
+
+            function addMessage(text, sender) {{
+                const messageElement = document.createElement("div");
+                messageElement.classList.add("message", sender);
+                const p = document.createElement("p");
+                p.innerHTML = text;
+                messageElement.appendChild(p);
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }}
+
+            function showTypingIndicator() {{
+                const indicator = document.createElement("div");
+                indicator.classList.add("typing-indicator");
+                indicator.innerHTML = "<span></span><span></span><span></span>";
+                indicator.id = "typingIndicator";
+                chatMessages.appendChild(indicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                setTimeout(() => {{
+                    indicator.style.display = "flex";
+                }}, 100);
+            }}
+
+            function hideTypingIndicator() {{
+                const indicator = document.getElementById("typingIndicator");
+                if (indicator) {{
+                    indicator.remove();
+                }}
+            }}
+
+            function showStep(step) {{
+                currentStep = step;
+                const content = courseContent[step];
+                updateProgressBar();
+
+                if (content.final) {{
+                    showFinalScreen();
+                    return;
+                }}
+                
+                showTypingIndicator();
+                setTimeout(() => {{
+                    hideTypingIndicator();
+                    addMessage(content.message, "assistant");
+                    if (content.options) {{
+                        optionsContainer.innerHTML = '';
+                        content.options.forEach(option => {{
+                            const button = document.createElement("button");
+                            button.classList.add("option-button");
+                            button.textContent = option;
+                            button.onclick = () => {{
+                                content.action(option);
+                                optionsContainer.innerHTML = '';
+                            }};
+                            optionsContainer.appendChild(button);
+                        }});
+                    }} else if (content.input) {{
+                        document.getElementById("input-area").style.display = 'flex';
+                        const userInput = document.getElementById("userInput");
+                        const sendBtn = document.getElementById("sendBtn");
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                        userInput.focus();
+                        sendBtn.onclick = () => {{
+                            if (userInput.value.trim() !== "") {{
+                                content.action(userInput.value);
+                                userInput.value = "";
+                                document.getElementById("input-area").style.display = 'none';
+                            }}
+                        }};
+                        userInput.onkeypress = (e) => {{
+                            if (e.key === 'Enter') {{
+                                sendBtn.click();
+                            }}
+                        }};
+                    }}
+                }}, 1500);
+            }}
+
+            function updateProgressBar() {{
+                const progress = (currentStep / courseContent.length) * 100;
+                progressBar.style.width = `${{progress}}%`;
+            }}
+
+            function showFinalScreen() {{
+                const finalMessage = "Curso finalizado. ¡Gracias por participar!";
+                addMessage(finalMessage, "assistant");
+                
+                setTimeout(() => {{
+                    ratingSection.style.display = 'block';
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }}, 1000);
+            }
+
+            // Lógica para la sección de evaluación
+            ratingStars.addEventListener('click', (e) => {{
+                if (e.target.tagName === 'SPAN') {{
+                    const rating = parseInt(e.target.dataset.rating);
+                    userRating = rating;
+                    document.querySelectorAll('.rating-stars span').forEach(star => {{
+                        star.classList.remove('filled');
+                        if (parseInt(star.dataset.rating) <= rating) {{
+                            star.classList.add('filled');
+                        }}
+                    }});
+                }}
+            }});
+
+            submitFeedbackBtn.addEventListener('click', () => {{
+                const feedbackText = document.getElementById('feedbackText').value;
+                const allowFeedback = document.getElementById('allowFeedback').checked;
+                
+                if (allowFeedback) {{
+                    console.log('Feedback enviado:', {{
+                        rating: userRating,
+                        feedback: feedbackText,
+                        timestamp: new Date().toISOString()
+                    }});
+                    // AQUI SE INSERTARÍA EL CÓDIGO PARA CONECTAR A GOOGLE SHEETS
+                    // O SE ENVIARÍA LA INFORMACIÓN A UN SERVIDOR INTERNO
+                }}
+                
+                if (userRating >= 4) {{
+                    googleReviewsPrompt.style.display = 'block';
+                }}
+                ratingSection.style.display = 'none';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }});
+
+            // Lógica para el registro de usuario al inicio (simulado)
+            function registerUser() {{
+                // Aquí iría la llamada a Google Sheets para registrar el usuario
+                // Ejemplo de código para una llamada AJAX (esto es un placeholder)
+                /*
+                fetch('TU_URL_DE_APLICACION_SHEETS', {{
+                    method: 'POST',
+                    body: JSON.stringify({{ name: 'Nombre del usuario' }}),
+                    headers: {{ 'Content-Type': 'application/json' }}
+                }})
+                .then(response => response.json())
+                .then(data => console.log('Registro exitoso', data))
+                .catch(error => console.error('Error en el registro', error));
+                */
+                console.log("Simulando registro de usuario en Google Sheets...");
+            }}
+
+            // Inicio del curso
+            registerUser();
+            showStep(0);
+        }});
+    </script>
+</body>
+</html>
+"""
+
+# Save the generated HTML content to a file
+with open('curso_investigacion_ia.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("HTML file 'curso_investigacion_ia.html' has been generated successfully.")
