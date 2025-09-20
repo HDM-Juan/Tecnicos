@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reparando Conexiones, No Solo Dispositivos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Paleta de colores de marca según la guía:
+         * Primario: #B22222 (Rojo corporativo)
+         * Secundario: #8B1A1A (Rojo oscuro)
+         * Fondo: white / #f8f9fa (Neutro claro)
+         * Texto: #333 (Gris oscuro)
+         * Éxito/Progreso: #B22222 (Para la barra de progreso)
+         * Botones: #B22222 y #8B1A1A (Hover)
+         */
+        
+        /* Estilos generales del cuerpo */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa; /* Fondo de marca */
+            color: #333; /* Texto de marca */
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Contenedor principal del curso */
+        .curso-container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #dee2e6;
+        }
+
+        /* Encabezado */
+        .curso-header {
+            background: linear-gradient(135deg, #B22222 0%, #8B1A1A 100%); /* Degradado de marca */
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        .curso-header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+        .curso-header p {
+            font-size: 1.1em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* Contenido del curso */
+        .curso-body {
+            padding: 40px;
+            flex-grow: 1;
+        }
+        .pagina {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        .pagina.activa {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            color: #B22222; /* Color de título de marca */
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 12px;
+            margin-top: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        h2 .icon {
+            margin-right: 15px;
+            font-size: 1.5em;
+        }
+        ul {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 12px;
+        }
+        .imagen-curso {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Barra de progreso */
+        .progreso-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        #barra-progreso {
+            width: 0%;
+            height: 10px;
+            background-color: #B22222; /* Color de éxito/progreso de marca */
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Estilos de los ejercicios */
+        .ejercicio-opciones {
+            margin-top: 25px;
+        }
+        .opcion {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 15px;
+            text-align: left;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease;
+        }
+        .opcion:hover:not(:disabled) {
+            background-color: #e9ecef;
+            border-color: #B22222; /* Color primario de marca en hover */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .opcion.correcta {
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+            color: #0f5132;
+            font-weight: bold;
+        }
+        .opcion.incorrecta {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+        }
+
+        /* Navegación y pie de página */
+        .curso-footer {
+            padding: 25px 40px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .navegacion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            background-color: #B22222; /* Color primario de marca */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn:hover:not(:disabled) {
+            background-color: #8B1A1A; /* Color secundario de marca en hover */
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background-color: #c0c0c0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #contador-pagina {
+            color: #6c757d;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="curso-container">
+    <header class="curso-header">
+        <h1>Reparando Conexiones, No Solo Dispositivos</h1>
+        <p>Módulo de Inducción: Calidad en la Atención al Cliente</p>
+        <div class="progreso-container">
+            <div id="barra-progreso"></div>
+        </div>
+    </header>
+
+    <main class="curso-body">
+        
+        <!-- Página 1: Introducción -->
+        <div class="pagina activa" id="pagina-1">
+            <h2><span class="icon">🚀</span> ¡Bienvenido al Proceso de Excelencia!</h2>
+            <p>En nuestro taller, no solo reparamos equipos; restauramos la conexión de las personas con su mundo. Tu rol es fundamental para que este proceso inicie con la máxima calidad. Este módulo te enseñará las técnicas clave para ser el punto de conexión entre el problema del cliente y nuestra solución técnica.</p>
+            <p>Aprenderás a gestionar las expectativas de los clientes, comunicar problemas técnicos de forma sencilla y convertir situaciones difíciles en oportunidades para fidelizar clientes. Tu progreso se guardará automáticamente.</p>
+        </div>
+
+        <!-- Página 2: La Primera Impresión (El Triángulo de la Bienvenida) -->
+        <div class="pagina" id="pagina-2">
+            <h2><span class="icon">🎯</span> La Primera Impresión: El Primer Control de Calidad</h2>
+            <p>El cliente que llega con un celular o tablet dañado, está estresado. Los primeros 30 segundos son nuestro primer control de calidad y definen si nos verá como un aliado o un problema más. La técnica clave es el <strong>Triángulo de la Bienvenida</strong>:</p>
+            <ul>
+                <li><strong>Contacto Visual Inmediato:</strong> Levanta la vista en cuanto entren. Les dice "Te he visto, eres importante". Es el primer paso para una interacción eficiente y sin desperdicios.</li>
+                <li><strong>Saludo Proactivo:</strong> Usa un saludo cálido como <em>"¡Buenas tardes! Bienvenido a [Nombre del Taller]. ¿En qué le podemos ayudar?"</em>. Esto inicia el flujo del proceso de atención.</li>
+                <li><strong>Postura Corporal Abierta:</strong> Descruza los brazos y asiente. Demuestra que estás escuchando y listo para tomar el servicio.</li>
+            </ul>
+        </div>
+
+        <!-- Página 3: Ejercicio 1 (Práctico) -->
+        <div class="pagina" id="pagina-3">
+            <h2><span class="icon">💡</span> Ejercicio 1: El Proceso de Recepción</h2>
+            <p>Estás terminando de generar una <strong>orden de servicio</strong> en la computadora y un cliente entra al taller. Se le ve apurado y algo molesto.</p>
+            <p><strong>¿Cuál es tu PRIMERA acción, de acuerdo con el proceso de calidad?</strong></p>
+            <div class="ejercicio-opciones">
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-1')">A) Terminar de cerrar la orden de servicio para no perder la información.</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, true, 'feedback-1')">B) Levantar la vista de inmediato, hacer contacto visual y con un gesto, indicar que le atenderás en un instante.</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-1')">C) Sin levantar la vista, decir en voz alta: "En un momento le atiendo".</button>
+            </div>
+            <div class="feedback" id="feedback-1" style="display:none;"></div>
+        </div>
+
+        <!-- Página 4: Psicología del Cliente -->
+        <div class="pagina" id="pagina-4">
+            <h2><span class="icon">🧠</span> Psicología del Cliente: De Problema a Solución</h2>
+            <p>No reparamos aparatos, resolvemos crisis. El celular o la tablet es la conexión de las personas con su mundo. Es vital **validar su ansiedad** con frases de empatía. Tu objetivo es posicionarte como un <strong>experto aliado</strong> que le quitará el problema de encima.</p>
+            <p><strong>Cliente:</strong> <em>"¡Es que se me mojó y tengo fotos de la graduación de mi hija que no puedo perder!"</em></p>
+            <p><strong>Respuesta Empática y Profesional (Correcto):</strong> <em>"Comprendo perfectamente su preocupación. Esa información es invaluable. Hizo bien en traerlo con nosotros, vamos a tratarlo con prioridad para ver qué podemos hacer."</em></p>
+        </div>
+
+        <!-- Página 5: Ejercicio 2 (Práctico) -->
+        <div class="pagina" id="pagina-5">
+            <h2><span class="icon">🤝</span> Ejercicio 2: Conectando con la Urgencia y la Marca</h2>
+            <p>Un cliente te explica con frustración que su tablet se mojó y contiene archivos muy importantes de su empresa.</p>
+            <p><strong>¿Cuál es la mejor respuesta para generar confianza y alinearse con nuestra marca?</strong></p>
+            <div class="ejercicio-opciones">
+                <button class="opcion" onclick="evaluarRespuesta(this, true, 'feedback-2')">A) "Comprendo su preocupación. Los datos corporativos son críticos. Le asignamos un folio de servicio para el diagnóstico y daremos seguimiento prioritario."</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-2')">B) "El daño por líquido es complicado y no siempre se recupera la información. Mejor le damos un presupuesto de una tablet nueva."</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-2')">C) "Ok, el costo del diagnóstico es de $500. ¿Lo dejamos?"</button>
+            </div>
+            <div class="feedback" id="feedback-2" style="display:none;"></div>
+        </div>
+        
+        <!-- Página 6: Comunicación Asertiva -->
+        <div class="pagina" id="pagina-6">
+            <h2><span class="icon">🗣️</span> Comunicación Asertiva: Traduciendo el Lenguaje Técnico</h2>
+            <p>La jerga técnica crea desconfianza. Debes ser un "traductor" confiable. Utiliza **analogías simples** y enfócate en el **beneficio** para el cliente. Aplica la fórmula: <strong>Problema > Solución > Beneficio.</strong></p>
+            <p><strong>Término técnico:</strong> <em>"El IC de carga está dañado."</em></p>
+            <p><strong>Explicación simple:</strong> <em>"El IC de carga es como el cerebro del teléfono para la energía. Se dañó y por eso no está cargando. Al cambiar este pequeño chip, restauramos la comunicación interna y el teléfono volverá a cargar como nuevo."</em></p>
+        </div>
+
+        <!-- Página 7: Manejo de Clientes Difíciles -->
+        <div class="pagina" id="pagina-7">
+            <h2><span class="icon">🛠️</span> Kaizen en la Atención: Manejo de Clientes Difíciles</h2>
+            <p>Una queja es una oportunidad para demostrar la calidad de nuestro servicio y detectar un punto de mejora en nuestros procesos. Usa la técnica **L.A.E.R.**: la base de una auditoría de calidad de servicio.</p>
+            <ul>
+                <li><strong>L - Listen (Escuchar):</strong> Deja que se desahogue. No interrumpas. Es tu oportunidad de recibir datos valiosos.</li>
+                <li><strong>A - Acknowledge (Reconocer):</strong> Valida su emoción. <em>"Entiendo por qué está molesto."</em></li>
+                <li><strong>E - Explore (Explorar):</strong> Haz preguntas para hacer un **Análisis de Causa Raíz**. "¿Cuándo notó el problema?"</li>
+                <li><strong>R - Respond (Responder):</strong> Ofrece una solución concreta y un plan de acción. "Vamos a pasar su equipo a diagnóstico de nuevo de forma prioritaria."</li>
+            </ul>
+        </div>
+
+        <!-- Página 8: Ejercicio 3 (Práctico) -->
+        <div class="pagina" id="pagina-8">
+            <h2><span class="icon">🧐</span> Ejercicio 3: La Queja del Cliente</h2>
+            <p>Un cliente regresa molesto porque después de cambiarle la batería, el celular se apaga a pesar de que tiene 40% de carga.</p>
+            <p><strong>Siguiendo la técnica L.A.E.R., ¿cuál es tu primer paso para iniciar la "auditoría de servicio"?</strong></p>
+            <div class="ejercicio-opciones">
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-3')">A) Explicarle que la batería es un componente diferente y que lo que le sucede no está cubierto por la garantía.</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, false, 'feedback-3')">B) Pedirle la nota de servicio y revisar el diagnóstico inicial para ver si no lo inventó.</button>
+                <button class="opcion" onclick="evaluarRespuesta(this, true, 'feedback-3')">C) Dejar de hacer lo que estás haciendo y escuchar atentamente toda su explicación sin interrumpir.</button>
+            </div>
+            <div class="feedback" id="feedback-3" style="display:none;"></div>
+        </div>
+
+        <!-- Página 9: Conclusión -->
+        <div class="pagina" id="pagina-9">
+            <h2><span class="icon">🏆</span> ¡Felicidades!</h2>
+            <p>Has completado las bases de la **Atención Profesional**. Cada cliente es una oportunidad para perfeccionar nuestros procesos y demostrar que somos los mejores. Recuerda: una queja bien gestionada genera más lealtad que una venta perfecta.</p>
+            <p><strong>Puntos Clave a Recordar:</strong></p>
+            <ul>
+                <li>La primera impresión se forma en 30 segundos. Es nuestro primer control de calidad.</li>
+                <li>Siempre valida la emoción del cliente para crear confianza.</li>
+                <li>Traduce lo técnico a un lenguaje simple. Eres un profesional de la comunicación.</li>
+                <li>Una queja es una oportunidad para la mejora continua. Usa la técnica L.A.E.R.</li>
+            </ul>
+            <p><strong>¡Ahora, a ponerlo en práctica!</strong></p>
+        </div>
+
+    </main>
+
+    <footer class="curso-footer">
+        <div class="navegacion">
+            <button id="btn-anterior" class="btn">Anterior</button>
+            <span id="contador-pagina"></span>
+            <button id="btn-siguiente" class="btn">Siguiente</button>
+        </div>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paginas = document.querySelectorAll('.pagina');
+        const btnAnterior = document.getElementById('btn-anterior');
+        const btnSiguiente = document.getElementById('btn-siguiente');
+        const barraProgreso = document.getElementById('barra-progreso');
+        const contadorPagina = document.getElementById('contador-pagina');
+        const totalPaginas = paginas.length;
+        const storageKey = 'progresoCursoAtencionProfesional';
+
+        let paginaActual = 0;
+
+        function mostrarPagina(indice) {
+            paginas.forEach((pagina, i) => {
+                pagina.classList.toggle('activa', i === indice);
+            });
+            paginaActual = indice;
+            actualizarUI();
+            localStorage.setItem(storageKey, paginaActual);
+        }
+
+        function actualizarUI() {
+            btnAnterior.disabled = paginaActual === 0;
+            btnSiguiente.disabled = paginaActual === totalPaginas - 1;
+            
+            const progreso = ((paginaActual + 1) / totalPaginas) * 100;
+            barraProgreso.style.width = progreso + '%';
+
+            contadorPagina.textContent = `Página ${paginaActual + 1} de ${totalPaginas}`;
+        }
+
+        btnSiguiente.addEventListener('click', () => {
+            if (paginaActual < totalPaginas - 1) {
+                mostrarPagina(paginaActual + 1);
+            }
+        });
+
+        btnAnterior.addEventListener('click', () => {
+            if (paginaActual > 0) {
+                mostrarPagina(paginaActual - 1);
+            }
+        });
+
+        const progresoGuardado = localStorage.getItem(storageKey);
+        if (progresoGuardado !== null) {
+            paginaActual = parseInt(progresoGuardado, 10);
+        }
+
+        mostrarPagina(paginaActual);
+    });
+
+    function evaluarRespuesta(boton, esCorrecta, feedbackId) {
+        const feedbackEl = document.getElementById(feedbackId);
+        const opciones = boton.parentElement.querySelectorAll('.opcion');
+
+        opciones.forEach(op => {
+            op.disabled = true;
+        });
+        
+        if (esCorrecta) {
+            boton.classList.add('correcta');
+            feedbackEl.style.color = '#0f5132';
+            feedbackEl.style.backgroundColor = '#d1e7dd';
+            feedbackEl.style.border = '1px solid #badbcc';
+            switch(feedbackId) {
+                case 'feedback-1':
+                    feedbackEl.innerHTML = '<strong>¡Correcto!</strong> Esta acción es la base del "Just-in-Time" de la atención al cliente. Un segundo de contacto visual crea confianza y evita un desperdicio de oportunidad.';
+                    break;
+                case 'feedback-2':
+                    feedbackEl.innerHTML = '<strong>¡Excelente!</strong> Esta respuesta conecta con la necesidad específica del cliente corporativo y lo ancla en nuestro proceso de calidad al hablar de "folio" y "seguimiento prioritario".';
+                    break;
+                case 'feedback-3':
+                    feedbackEl.innerHTML = '<strong>¡Muy bien!</strong> El primer paso siempre es escuchar. Permite que el cliente se desahogue y te da los datos clave para el análisis de causa raíz. Es la esencia de una auditoría de calidad.';
+                    break;
+            }
+        } else {
+            boton.classList.add('incorrecta');
+            feedbackEl.style.color = '#842029';
+            feedbackEl.style.backgroundColor = '#f8d7da';
+            feedbackEl.style.border = '1px solid #f5c2c7';
+            switch(feedbackId) {
+                case 'feedback-1':
+                    feedbackEl.innerHTML = '<strong>Inténtalo de nuevo.</strong> El desperdicio más grande en servicio es la falta de atención inicial. Tu prioridad es reconocer la presencia del cliente.';
+                    break;
+                case 'feedback-2':
+                    feedbackEl.innerHTML = '<strong>No es la mejor opción.</strong> Hablar de problemas o costos de inmediato aumenta la ansiedad del cliente. Primero, conecta con su preocupación y con nuestra marca.';
+                    break;
+                case 'feedback-3':
+                    feedbackEl.innerHTML = '<strong>Respuesta incorrecta.</strong> Ponerse a la defensiva o ser burocrático antes de escuchar escala el conflicto. El primer paso es siempre escuchar (Listen).';
+                    break;
+            }
+        }
+        feedbackEl.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
